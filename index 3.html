@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Trader 90D Control Center v4</title>
+<style>
+:root{--bg:#06101d;--side:#08182b;--panel:#0e1d33;--panel2:#10243f;--line:#1b3f69;--text:#eaf2ff;--muted:#9ebde4;--blue:#1f77d4;--green:#37d67a;--red:#ff6b6b;--warn:#ffd166}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,Helvetica,sans-serif}.app{display:flex;min-height:100vh}.side{width:260px;background:var(--side);padding:20px;position:fixed;top:0;bottom:0;border-right:1px solid var(--line)}.brand h1{font-size:22px;margin:0}.brand p{color:var(--muted);margin:6px 0 20px}.nav{width:100%;padding:13px 14px;margin:7px 0;border:0;border-radius:13px;background:transparent;color:#bcd4f2;text-align:left;font-weight:800;cursor:pointer}.nav.active,.nav:hover{background:#12365f;color:#fff}main{margin-left:260px;width:calc(100% - 260px);padding:24px;max-width:1260px}.screen{display:none}.screen.active{display:block}h2{font-size:31px;margin:0}.hint{color:var(--muted);margin:7px 0 0;line-height:1.45}.top{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;margin-bottom:18px}.btn{border:0;border-radius:12px;background:var(--blue);color:#fff;font-weight:900;padding:12px 15px;cursor:pointer}.btn.small{padding:8px 10px;font-size:12px}.btn.gray{background:#153456}.btn.red{background:#a83a3a}.btn.green{background:#208d53}.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:18px 0}.card,.panel,.form{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:18px;box-shadow:0 10px 26px rgba(0,0,0,.18)}.card span{color:var(--muted);font-size:13px}.card strong{display:block;font-size:25px;margin-top:8px}.good{color:var(--green)}.bad{color:var(--red)}.warn{color:var(--warn)}.panel{margin-top:18px}.panel h3{margin:0 0 12px}.progress{height:18px;background:#07111f;border-radius:20px;overflow:hidden;border:1px solid #244b78}.progress div{height:100%;width:0;background:linear-gradient(90deg,var(--blue),var(--green));transition:.25s}.form{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-top:18px}.form.compact{grid-template-columns:repeat(3,1fr)}label{display:block;color:#bcd4f2;font-size:13px}input,select,textarea{width:100%;margin-top:6px;background:#07111f;color:#fff;border:1px solid #244b78;border-radius:12px;padding:12px;font-size:15px}textarea{min-height:82px;resize:vertical}.full{grid-column:1/-1}.row{display:grid;grid-template-columns:1fr 1fr;gap:14px}.item{padding:12px;border-bottom:1px solid #244b78}.item:last-child{border-bottom:0}.itemTop{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}.actions{display:flex;gap:8px;flex-wrap:wrap}.badge{display:inline-block;padding:5px 9px;border-radius:999px;background:#12365f;color:#d7e9ff;font-size:12px;font-weight:800}.table{width:100%;border-collapse:collapse}.table th,.table td{padding:10px;border-bottom:1px solid #244b78;text-align:left}.table th{color:var(--muted)}.calcBox{background:#07111f;border:1px solid #244b78;border-radius:14px;padding:14px}.rule{margin:10px 0;padding:15px;border-radius:14px;background:var(--panel);border:1px solid var(--line)}.toolbar{display:flex;gap:10px;flex-wrap:wrap}.hidden{display:none!important}
+@media(max-width:920px){.app{display:block}.side{position:relative;width:100%;bottom:auto}.brand{margin-bottom:12px}main{margin:0;width:100%;padding:16px}.cards,.form,.form.compact,.row{grid-template-columns:1fr}.itemTop{display:block}.actions{margin-top:10px}h2{font-size:26px}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="side">
+  <div class="brand"><h1>Trader 90D<br>Control Center</h1><p>André Almeida • V4</p></div>
+  <button class="nav active" onclick="tela('dash',this)">Dashboard</button>
+  <button class="nav" onclick="tela('diario',this)">Diário</button>
+  <button class="nav" onclick="tela('operacao',this)">Operações</button>
+  <button class="nav" onclick="tela('contas',this)">Contas</button>
+  <button class="nav" onclick="tela('escala',this)">Escala</button>
+  <button class="nav" onclick="tela('stats',this)">Estatísticas</button>
+  <button class="nav" onclick="tela('dados',this)">Dados</button>
+  <button class="nav" onclick="tela('regras',this)">Regras</button>
+</aside>
+
+<main>
+<section id="dash" class="screen active">
+  <div class="top">
+    <div><h2>Projeto 90 Dias</h2><p class="hint">Sistema de gestão para múltiplas contas, copier, disciplina e saques.</p></div>
+    <div class="toolbar"><button class="btn" onclick="backup()">Exportar backup</button><button class="btn gray" onclick="telaPorId('operacao')">Nova operação</button></div>
+  </div>
+  <div class="cards">
+    <div class="card"><span>Meta</span><strong>US$ 15.000</strong></div>
+    <div class="card"><span>Lucro acumulado</span><strong id="lucro">US$ 0</strong></div>
+    <div class="card"><span>Contas ativas</span><strong id="ativas">0</strong></div>
+    <div class="card"><span>Disciplina média</span><strong id="discmed">0.0</strong></div>
+  </div>
+  <div class="cards">
+    <div class="card"><span>Setup A+</span><strong id="setupPct">0%</strong></div>
+    <div class="card"><span>Trades copiáveis</span><strong id="copyPct">0%</strong></div>
+    <div class="card"><span>Taxa de acerto</span><strong id="winPct">0%</strong></div>
+    <div class="card"><span>Resultado médio</span><strong id="mediaTrade">US$ 0</strong></div>
+  </div>
+  <div class="panel"><h3>Progresso da meta</h3><div class="progress"><div id="bar"></div></div><p id="pct" class="hint">0% da meta concluída</p></div>
+  <div class="row">
+    <div class="panel"><h3>Últimos registros</h3><div id="feed" class="hint">Nenhum registro ainda.</div></div>
+    <div class="panel"><h3>Pergunta do gestor</h3><p style="font-size:23px;font-weight:900">Eu copiaria este trade em 20 contas?</p><p class="hint">Se a resposta for não, o trade não deveria existir.</p></div>
+  </div>
+</section>
+
+<section id="diario" class="screen">
+  <div class="top"><div><h2>Diário do Trader</h2><p class="hint">Editar/excluir disponível. O diário mede o trader, não só o resultado.</p></div><button class="btn gray" onclick="novoDiario()">Novo diário</button></div>
+  <div class="form" id="formDiario">
+    <input id="dEdit" type="hidden">
+    <label>Data<input id="dData" type="date"></label>
+    <label>Estado mental<select id="dMental"><option>Calmo</option><option>Ansioso</option><option>Cansado</option><option>Confiante</option><option>Distraído</option></select></label>
+    <label class="full">Notícias/Dados<input id="dNoticias" placeholder="Ex: Payroll 09h30, Michigan 11h, FOMC 15h"></label>
+    <label class="full">Pré-mercado<textarea id="dPre" placeholder="Contexto: NQ, DXY, VIX, Europa, Big Techs, regiões e médias"></textarea></label>
+    <label>Viés<select id="dVies"><option>Compra</option><option>Venda</option><option>Neutro</option></select></label>
+    <label>Setup A+?<select id="dSetup"><option>Sim</option><option>Não</option></select></label>
+    <label>Copiaria em 20 contas?<select id="dCopy"><option>Sim</option><option>Talvez</option><option>Não</option></select></label>
+    <label>Segui o plano?<select id="dPlano"><option>Sim</option><option>Não</option></select></label>
+    <label>Disciplina 0-10<input id="dDisc" type="number" min="0" max="10" value="8"></label>
+    <label>Emocional 0-10<input id="dEmo" type="number" min="0" max="10" value="8"></label>
+    <label class="full">Erro principal<textarea id="dErro" placeholder="Ex: nenhum, antecipei entrada, mexi no stop, zerei cedo"></textarea></label>
+    <label class="full">Aprendizado<textarea id="dApr" placeholder="O que precisa ser repetido ou corrigido?"></textarea></label>
+    <button class="btn" onclick="salvarDiario()">Salvar diário</button>
+  </div>
+  <div class="panel"><h3>Registros do diário</h3><div id="listaDiarios" class="hint">Nenhum diário cadastrado.</div></div>
+</section>
+
+<section id="operacao" class="screen">
+  <div class="top"><div><h2>Operações</h2><p class="hint">Agora a operação puxa a conta cadastrada. Também possui editar e excluir.</p></div><button class="btn gray" onclick="novaOp()">Nova operação</button></div>
+  <div class="form compact">
+    <input id="oEdit" type="hidden">
+    <label>Conta cadastrada<select id="oContaSelect" onchange="syncContaSelecionada()"></select></label>
+    <label>Mesa<input id="oMesa" readonly placeholder="Automático"></label>
+    <label>Status da conta<input id="oStatus" readonly placeholder="Automático"></label>
+    <label>Setup<input id="oSetup" placeholder="Ex: Pullback A+"></label>
+    <label>Direção<select id="oDir"><option>Compra</option><option>Venda</option></select></label>
+    <label>MNQ<input id="oMnq" type="number" value="3" oninput="calcOp()"></label>
+    <label>Stop pts<input id="oStop" type="number" value="30" oninput="calcOp()"></label>
+    <label>Alvo pts<input id="oAlvo" type="number" value="60" oninput="calcOp()"></label>
+    <label>Resultado USD<input id="oRes" type="number" step="0.01" value="0"></label>
+    <label>Hora entrada<input id="oEntrada" type="time"></label>
+    <label>Hora saída<input id="oSaida" type="time"></label>
+    <label>Copiaria em 20 contas?<select id="oCopy"><option>Sim</option><option>Talvez</option><option>Não</option></select></label>
+    <div class="full calcBox"><b>Pré-cálculo:</b><p id="opCalc" class="hint">Risco: US$ 180 | Alvo: US$ 360 | RR: 1:2.00</p></div>
+    <label class="full">Observação<textarea id="oObs" placeholder="Como foi a execução? Teve hesitação? Mexeu no stop?"></textarea></label>
+    <button class="btn" onclick="salvarOp()">Salvar operação</button>
+  </div>
+  <div class="panel"><h3>Histórico de operações</h3><div id="histOps" class="hint">Nenhuma operação registrada.</div></div>
+</section>
+
+<section id="contas" class="screen">
+  <div class="top"><div><h2>Contas</h2><p class="hint">Cadastro único. Depois a operação seleciona a conta no menu.</p></div><button class="btn gray" onclick="novaConta()">Nova conta</button></div>
+  <div class="form compact">
+    <input id="cEdit" type="hidden">
+    <label>Mesa<select id="cMesa"><option>Apex</option><option>TradeDay</option><option>Mide</option><option>Earn2Trade</option></select></label>
+    <label>Nome/ID<input id="cNome" placeholder="Ex: Apex 01"></label>
+    <label>Status<select id="cStatus"><option>Avaliação</option><option>Aprovada</option><option>Financiada</option><option>Reprovada</option></select></label>
+    <label>Saldo atual<input id="cSaldo" type="number" step="0.01" value="0"></label>
+    <label>DD disponível<input id="cDD" type="number" step="0.01" value="0"></label>
+    <label>Meta/Saque<input id="cMeta" type="number" step="0.01" value="0"></label>
+    <button class="btn" onclick="salvarConta()">Salvar conta</button>
+  </div>
+  <div class="panel"><h3>Minhas contas</h3><div id="listaContas" class="hint">Nenhuma conta cadastrada.</div></div>
+</section>
+
+<section id="escala" class="screen">
+  <h2>Escala Copier</h2><p class="hint">Projeção usando 3 MNQ e movimento de 50 pontos por conta.</p>
+  <div class="cards"><div class="card"><span>1 conta</span><strong>US$ 300</strong></div><div class="card"><span>5 contas</span><strong>US$ 1.500</strong></div><div class="card"><span>10 contas</span><strong>US$ 3.000</strong></div><div class="card"><span>20 contas</span><strong>US$ 6.000</strong></div></div>
+  <div class="panel"><h3>Plano de escala</h3><table class="table"><tr><th>Fase</th><th>Objetivo</th><th>Condição</th></tr><tr><td>Fase 1</td><td>Validar 3 MNQ + stop 30 pts</td><td>Disciplina média acima de 8</td></tr><tr><td>Fase 2</td><td>3 a 5 contas TradeDay</td><td>Trades copiáveis acima de 80%</td></tr><tr><td>Fase 3</td><td>10 contas Apex</td><td>Sem violar regra por 30 dias</td></tr><tr><td>Fase 4</td><td>20 contas Apex</td><td>Consistência + saques recorrentes</td></tr></table></div>
+</section>
+
+<section id="stats" class="screen">
+  <h2>Estatísticas</h2>
+  <div class="cards"><div class="card"><span>Total de operações</span><strong id="stTotal">0</strong></div><div class="card"><span>Gains</span><strong id="stGains">0</strong></div><div class="card"><span>Losses</span><strong id="stLoss">0</strong></div><div class="card"><span>Taxa de acerto</span><strong id="stWin">0%</strong></div></div>
+  <div class="cards"><div class="card"><span>Média gain</span><strong id="stAvgGain">US$ 0</strong></div><div class="card"><span>Média loss</span><strong id="stAvgLoss">US$ 0</strong></div><div class="card"><span>Expectativa</span><strong id="stExp">US$ 0</strong></div><div class="card"><span>Maior resultado</span><strong id="stBest">US$ 0</strong></div></div>
+</section>
+
+<section id="dados" class="screen">
+  <h2>Dados e Backup</h2><p class="hint">Nesta V4 os dados ainda ficam no navegador. Use backup. Na versão nuvem, conectamos Firebase/Supabase.</p>
+  <div class="panel">
+    <h3>Backup</h3>
+    <div class="toolbar"><button class="btn" onclick="backup()">Exportar backup JSON</button><label class="btn gray" style="display:inline-block">Importar backup<input type="file" accept=".json" onchange="importarBackup(event)" style="display:none"></label><button class="btn red" onclick="limparTudo()">Apagar tudo</button></div>
+  </div>
+  <div class="panel"><h3>Armazenamento atual</h3><p class="hint">localStorage do navegador: salva neste aparelho/navegador. GitHub Pages hospeda o app, mas não salva seus dados na nuvem.</p></div>
+</section>
+
+<section id="regras" class="screen">
+  <h2>Regras do Projeto</h2>
+  <div class="rule">1. Operar apenas Setup A+.</div><div class="rule">2. Base de teste: 3 MNQ com stop de 30 pontos.</div><div class="rule">3. Máximo 2 trades por dia.</div><div class="rule">4. Dois stops = encerra o dia.</div><div class="rule">5. Não operar por tédio, raiva, pressa ou recuperação.</div><div class="rule">6. Só escalar se a disciplina média ficar acima de 8.</div><div class="rule">7. Antes de operar: “Eu copiaria este trade em 20 contas?”</div>
+</section>
+</main>
+</div>
+
+<script>
+const meta=15000,pontoMNQ=2;
+let db=JSON.parse(localStorage.getItem("trader90_cc_v4")||'{"diarios":[],"ops":[],"contas":[]}');
+
+function id(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7)}
+function tela(idTela,b){document.querySelectorAll(".screen").forEach(x=>x.classList.remove("active"));document.querySelectorAll(".nav").forEach(x=>x.classList.remove("active"));document.getElementById(idTela).classList.add("active");if(b)b.classList.add("active")}
+function telaPorId(idTela){document.querySelectorAll(".nav").forEach(btn=>{if(btn.getAttribute("onclick")?.includes("'"+idTela+"'")){tela(idTela,btn)}})}
+function usd(v){return "US$ "+Number(v||0).toLocaleString("en-US",{maximumFractionDigits:2})}
+function pct(n,d){return d?Math.round(n/d*100):0}
+function save(){localStorage.setItem("trader90_cc_v4",JSON.stringify(db));render()}
+function lucroEl(idEl,v){const el=document.getElementById(idEl);el.textContent=usd(v);el.className=Number(v)>=0?"good":"bad"}
+
+function novaConta(){cEdit.value="";cMesa.value="Apex";cNome.value="";cStatus.value="Avaliação";cSaldo.value=0;cDD.value=0;cMeta.value=0}
+function salvarConta(){const obj={id:cEdit.value||id(),mesa:cMesa.value,nome:cNome.value,status:cStatus.value,saldo:Number(cSaldo.value||0),dd:Number(cDD.value||0),meta:Number(cMeta.value||0)};const i=db.contas.findIndex(x=>x.id===obj.id);if(i>=0)db.contas[i]=obj;else db.contas.push(obj);novaConta();save();alert("Conta salva.")}
+function editarConta(cid){const c=db.contas.find(x=>x.id===cid);if(!c)return;cEdit.value=c.id;cMesa.value=c.mesa;cNome.value=c.nome;cStatus.value=c.status;cSaldo.value=c.saldo;cDD.value=c.dd;cMeta.value=c.meta;telaPorId("contas")}
+function excluirConta(cid){if(!confirm("Excluir esta conta? Operações antigas continuarão registradas com o nome da conta."))return;db.contas=db.contas.filter(x=>x.id!==cid);save()}
+
+function novaOp(){oEdit.value="";oSetup.value="";oDir.value="Compra";oMnq.value=3;oStop.value=30;oAlvo.value=60;oRes.value=0;oEntrada.value="";oSaida.value="";oCopy.value="Sim";oObs.value="";syncContaSelecionada();calcOp()}
+function syncContaSelecionada(){const c=db.contas.find(x=>x.id===oContaSelect.value);oMesa.value=c?c.mesa:"";oStatus.value=c?c.status:""}
+function calcOp(){const mnq=Number(oMnq.value||0),stop=Number(oStop.value||0),alvo=Number(oAlvo.value||0);const risco=mnq*stop*pontoMNQ,ganho=mnq*alvo*pontoMNQ,rr=risco?ganho/risco:0;opCalc.textContent=`Risco: ${usd(risco)} | Alvo: ${usd(ganho)} | RR: 1:${rr.toFixed(2)}`}
+function salvarOp(){const c=db.contas.find(x=>x.id===oContaSelect.value);const obj={id:oEdit.value||id(),data:new Date().toISOString().slice(0,10),contaId:oContaSelect.value,conta:c?c.nome:"Sem conta",mesa:c?c.mesa:oMesa.value,status:c?c.status:oStatus.value,setup:oSetup.value,dir:oDir.value,mnq:Number(oMnq.value||0),stop:Number(oStop.value||0),alvo:Number(oAlvo.value||0),res:Number(oRes.value||0),entrada:oEntrada.value,saida:oSaida.value,copy:oCopy.value,obs:oObs.value};const i=db.ops.findIndex(x=>x.id===obj.id);if(i>=0)db.ops[i]=obj;else db.ops.push(obj);novaOp();save();alert("Operação salva.")}
+function editarOp(oid){const o=db.ops.find(x=>x.id===oid);if(!o)return;oEdit.value=o.id;oContaSelect.value=o.contaId||"";syncContaSelecionada();oSetup.value=o.setup||"";oDir.value=o.dir||"Compra";oMnq.value=o.mnq||3;oStop.value=o.stop||30;oAlvo.value=o.alvo||60;oRes.value=o.res||0;oEntrada.value=o.entrada||"";oSaida.value=o.saida||"";oCopy.value=o.copy||"Sim";oObs.value=o.obs||"";calcOp();telaPorId("operacao")}
+function excluirOp(oid){if(!confirm("Excluir esta operação?"))return;db.ops=db.ops.filter(x=>x.id!==oid);save()}
+
+function novoDiario(){dEdit.value="";dData.value="";dMental.value="Calmo";dNoticias.value="";dPre.value="";dVies.value="Compra";dSetup.value="Sim";dCopy.value="Sim";dPlano.value="Sim";dDisc.value=8;dEmo.value=8;dErro.value="";dApr.value=""}
+function salvarDiario(){const obj={id:dEdit.value||id(),data:dData.value||new Date().toISOString().slice(0,10),mental:dMental.value,noticias:dNoticias.value,pre:dPre.value,vies:dVies.value,setup:dSetup.value,copy:dCopy.value,plano:dPlano.value,disc:Number(dDisc.value||0),emo:Number(dEmo.value||0),erro:dErro.value,apr:dApr.value};const i=db.diarios.findIndex(x=>x.id===obj.id);if(i>=0)db.diarios[i]=obj;else db.diarios.push(obj);novoDiario();save();alert("Diário salvo.")}
+function editarDiario(did){const d=db.diarios.find(x=>x.id===did);if(!d)return;dEdit.value=d.id;dData.value=d.data;dMental.value=d.mental;dNoticias.value=d.noticias||"";dPre.value=d.pre||"";dVies.value=d.vies||"Compra";dSetup.value=d.setup||"Sim";dCopy.value=d.copy||"Sim";dPlano.value=d.plano||"Sim";dDisc.value=d.disc||8;dEmo.value=d.emo||8;dErro.value=d.erro||"";dApr.value=d.apr||"";telaPorId("diario")}
+function excluirDiario(did){if(!confirm("Excluir este diário?"))return;db.diarios=db.diarios.filter(x=>x.id!==did);save()}
+
+function backup(){let blob=new Blob([JSON.stringify(db,null,2)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="backup_trader90_control_center_v4.json";a.click()}
+function importarBackup(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const data=JSON.parse(r.result);if(!data.diarios||!data.ops||!data.contas)throw new Error("Formato inválido");db=data;save();alert("Backup importado.")}catch(err){alert("Erro ao importar backup.")}};r.readAsText(f)}
+function limparTudo(){if(confirm("Apagar todos os dados deste navegador?")){db={diarios:[],ops:[],contas:[]};save()}}
+
+function render(){
+  const lucro=db.ops.reduce((s,o)=>s+Number(o.res||0),0),ops=db.ops,gains=ops.filter(o=>Number(o.res)>0),losses=ops.filter(o=>Number(o.res)<0);
+  const disciplina=db.diarios.length?db.diarios.reduce((s,d)=>s+Number(d.disc||0),0)/db.diarios.length:0,ativasCount=db.contas.filter(c=>["Aprovada","Financiada"].includes(c.status)).length;
+  const setupSim=db.diarios.filter(d=>d.setup==="Sim").length,copySim=db.diarios.filter(d=>d.copy==="Sim").length,win=pct(gains.length,ops.length),progresso=Math.max(0,Math.min(100,Math.round(lucro/meta*100))),media=ops.length?lucro/ops.length:0;
+  const avgGain=gains.length?gains.reduce((s,o)=>s+Number(o.res),0)/gains.length:0,avgLoss=losses.length?losses.reduce((s,o)=>s+Number(o.res),0)/losses.length:0,exp=ops.length?lucro/ops.length:0,best=ops.length?Math.max(...ops.map(o=>Number(o.res||0))):0;
+
+  lucroEl("lucro",lucro);document.getElementById("ativas").textContent=ativasCount;discmed.textContent=disciplina.toFixed(1);setupPct.textContent=pct(setupSim,db.diarios.length)+"%";copyPct.textContent=pct(copySim,db.diarios.length)+"%";winPct.textContent=win+"%";lucroEl("mediaTrade",media);bar.style.width=progresso+"%";document.getElementById("pct").textContent=progresso+"% da meta concluída";
+
+  oContaSelect.innerHTML=db.contas.length?db.contas.map(c=>`<option value="${c.id}">${c.nome} • ${c.mesa} • ${c.status}</option>`).join(""):`<option value="">Cadastre uma conta primeiro</option>`;
+  syncContaSelecionada();
+
+  const eventos=[...db.diarios.map(d=>({t:"Diário",data:d.data,txt:`${d.vies} | Mental: ${d.mental} | A+: ${d.setup} | 20 contas: ${d.copy}`})),...db.ops.map(o=>({t:"Operação",data:o.data,txt:`${o.conta||"Conta"} | ${o.dir} | ${o.mnq} MNQ | ${usd(o.res)}`}))].sort((a,b)=>(b.data||"").localeCompare(a.data||"")).slice(0,8);
+  feed.innerHTML=eventos.length?eventos.map(e=>`<div class="item"><b>${e.t}</b> — ${e.data}<br>${e.txt}</div>`).join(""):"Nenhum registro ainda.";
+
+  listaContas.innerHTML=db.contas.length?db.contas.map(c=>`<div class="item"><div class="itemTop"><div><b>${c.nome||"Conta"}</b> <span class="badge">${c.status}</span><br>${c.mesa} | Saldo: ${usd(c.saldo)} | DD: ${usd(c.dd)} | Meta/Saque: ${usd(c.meta)}</div><div class="actions"><button class="btn small gray" onclick="editarConta('${c.id}')">Editar</button><button class="btn small red" onclick="excluirConta('${c.id}')">Excluir</button></div></div></div>`).join(""):"Nenhuma conta cadastrada.";
+
+  histOps.innerHTML=ops.length?ops.slice().reverse().map(o=>`<div class="item"><div class="itemTop"><div><b>${o.data}</b> — ${o.conta||"Conta"} <span class="badge">${o.mesa||""}</span><br>${o.setup||"Setup"} | ${o.dir} | ${o.mnq} MNQ | Stop ${o.stop} pts | Alvo ${o.alvo} pts | <b>${usd(o.res)}</b><br><span class="hint">Copiaria em 20 contas: ${o.copy||"—"}</span></div><div class="actions"><button class="btn small gray" onclick="editarOp('${o.id}')">Editar</button><button class="btn small red" onclick="excluirOp('${o.id}')">Excluir</button></div></div></div>`).join(""):"Nenhuma operação registrada.";
+
+  listaDiarios.innerHTML=db.diarios.length?db.diarios.slice().reverse().map(d=>`<div class="item"><div class="itemTop"><div><b>${d.data}</b> — ${d.vies} <span class="badge">${d.mental}</span><br>Notícias: ${d.noticias||"—"}<br>A+: ${d.setup} | 20 contas: ${d.copy} | Disciplina: ${d.disc}</div><div class="actions"><button class="btn small gray" onclick="editarDiario('${d.id}')">Editar</button><button class="btn small red" onclick="excluirDiario('${d.id}')">Excluir</button></div></div></div>`).join(""):"Nenhum diário cadastrado.";
+
+  stTotal.textContent=ops.length;stGains.textContent=gains.length;stLoss.textContent=losses.length;stWin.textContent=win+"%";lucroEl("stAvgGain",avgGain);lucroEl("stAvgLoss",avgLoss);lucroEl("stExp",exp);lucroEl("stBest",best);
+  calcOp();
+}
+novoDiario();render();
+</script>
+</body></html>
